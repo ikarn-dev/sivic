@@ -22,7 +22,7 @@ export function LineChart({ data, options, height = 250 }: LineChartProps) {
                 labels: {
                     color: CHART_COLORS.text,
                     font: {
-                        family: 'Inter, system-ui, sans-serif',
+                        family: 'Nohemi, system-ui, sans-serif',
                         size: 11,
                     },
                     padding: 12,

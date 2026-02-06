@@ -5,6 +5,8 @@ export { CHART_COLORS, THREAT_COLORS, SEVERITY_COLORS, DEX_COLORS } from './conf
 export { LineChart } from './LineChart';
 export { BarChart } from './BarChart';
 export { DoughnutChart } from './DoughnutChart';
+export { AreaChart } from './AreaChart';
+export { HorizontalBarChart } from './HorizontalBarChart';
 
 // Specialized chart components
 export { ThreatDistributionChart } from './ThreatDistributionChart';

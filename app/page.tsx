@@ -10,12 +10,13 @@ import { NetworkMetrics } from '@/components/NetworkMetrics';
 import { TVLOverview } from '@/components/TVLOverview';
 import { DEXVolumeOverview } from '@/components/DEXVolumeOverview';
 import { ProtocolGrid } from '@/components/ProtocolCard';
+import { BarChart, HorizontalBarChart, CHART_COLORS, DEX_COLORS } from '@/components/charts';
 import { useNetworkHealth } from '@/hooks/useNetworkHealth';
 import { useEcosystem } from '@/hooks/useEcosystem';
 import { useDexVolumes } from '@/hooks/useDexVolumes';
 import { useProtocolsTreemap } from '@/hooks/useProtocolsTreemap';
 import { usePrefetch } from '@/hooks/usePrefetch';
-import { formatNumberExact, formatPercent } from '@/lib/utils/format';
+import { formatNumberExact, formatPercent, formatUSD } from '@/lib/utils/format';
 
 export default function Home() {
   // Warm the cache on first load
@@ -81,6 +82,54 @@ export default function Home() {
     ).slice(0, 12);
   };
 
+  // DEX chart data - show all major Solana DEXs
+  const getDexBarChartData = () => {
+    if (!dexData?.dexes) return null;
+    const topDexes = dexData.dexes.slice(0, 10);
+
+    // Color palette for DEXs
+    const colors = [
+      '#10b981', // Jupiter - emerald
+      '#8b5cf6', // Raydium - purple
+      '#f97316', // Orca - orange
+      '#38bdf8', // Meteora - sky
+      '#ec4899', // Drift - pink
+      '#facc15', // Jito - yellow
+      '#14b8a6', // teal
+      '#a78bfa', // violet
+      '#fb923c', // orange light
+      '#4ade80', // green
+    ];
+
+    return {
+      labels: topDexes.map(d => d.displayName || d.name),
+      datasets: [{
+        label: '24h Volume',
+        data: topDexes.map(d => d.total24h),
+        backgroundColor: colors.slice(0, topDexes.length),
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    };
+  };
+
+  // Horizontal bar chart for DEX rankings
+  const getDexRankingData = () => {
+    if (!dexData?.dexes) return null;
+    const topDexes = dexData.dexes.slice(0, 8);
+
+    return {
+      labels: topDexes.map(d => d.displayName || d.name),
+      datasets: [{
+        label: '24h Volume',
+        data: topDexes.map(d => d.total24h),
+        backgroundColor: 'rgba(16, 185, 129, 0.8)', // Emerald
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    };
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-5">
@@ -132,6 +181,72 @@ export default function Home() {
           )}
         </div>
 
+        {/* DEX Volume Charts - Prioritized at top */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <GlassContainerCard title="DEX Volume Comparison (24h)">
+            {dexLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin w-8 h-8 border-2 border-[#f97316] border-t-transparent rounded-full" />
+              </div>
+            ) : getDexBarChartData() ? (
+              <BarChart
+                data={getDexBarChartData()!}
+                height={280}
+                options={{
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: ${formatUSD(ctx.raw as number)}`
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      ticks: {
+                        callback: (value) => formatUSD(value as number)
+                      }
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <GlassContainerEmpty message="No DEX data available" />
+            )}
+          </GlassContainerCard>
+
+          <GlassContainerCard title="Top Solana DEXs by Volume">
+            {dexLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin w-8 h-8 border-2 border-[#f97316] border-t-transparent rounded-full" />
+              </div>
+            ) : getDexRankingData() ? (
+              <HorizontalBarChart
+                data={getDexRankingData()!}
+                height={280}
+                options={{
+                  plugins: {
+                    tooltip: {
+                      callbacks: {
+                        label: (ctx) => `Volume: ${formatUSD(ctx.raw as number)}`
+                      }
+                    }
+                  },
+                  scales: {
+                    x: {
+                      ticks: {
+                        callback: (value) => formatUSD(value as number)
+                      }
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <GlassContainerEmpty message="No DEX data available" />
+            )}
+          </GlassContainerCard>
+        </div>
+
         {/* Ecosystem Data Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TVLOverview
@@ -144,6 +259,7 @@ export default function Home() {
             isLoading={dexLoading}
             totalVolume24h={dexData?.totalVolume24h}
             dexes={dexData?.dexes}
+            maxItems={50}
           />
         </div>
 

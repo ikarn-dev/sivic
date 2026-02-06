@@ -35,24 +35,25 @@ interface EcosystemTreemapProps {
 // ============================================
 
 const CATEGORY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-    dexs: { bg: 'rgba(16, 185, 129, 0.25)', border: 'rgba(16, 185, 129, 0.5)', text: '#10b981' },
-    lending: { bg: 'rgba(139, 92, 246, 0.25)', border: 'rgba(139, 92, 246, 0.5)', text: '#8b5cf6' },
-    staking: { bg: 'rgba(6, 182, 212, 0.25)', border: 'rgba(6, 182, 212, 0.5)', text: '#06b6d4' },
-    nft: { bg: 'rgba(236, 72, 153, 0.25)', border: 'rgba(236, 72, 153, 0.5)', text: '#ec4899' },
-    bridges: { bg: 'rgba(99, 102, 241, 0.25)', border: 'rgba(99, 102, 241, 0.5)', text: '#6366f1' },
-    yield: { bg: 'rgba(251, 191, 36, 0.25)', border: 'rgba(251, 191, 36, 0.5)', text: '#fbbf24' },
-    perpetuals: { bg: 'rgba(249, 115, 22, 0.25)', border: 'rgba(249, 115, 22, 0.5)', text: '#f97316' },
-    derivatives: { bg: 'rgba(239, 68, 68, 0.25)', border: 'rgba(239, 68, 68, 0.5)', text: '#ef4444' },
-    default: { bg: 'rgba(156, 163, 175, 0.15)', border: 'rgba(156, 163, 175, 0.3)', text: '#9ca3af' },
+    dexs: { bg: '#064e3b', border: '#065f46', text: '#ffff' },       // emerald-900/800
+    lending: { bg: '#4c1d95', border: '#5b21b6', text: '#ffff' },    // violet-900/800
+    staking: { bg: '#164e63', border: '#155e75', text: '#ffff' },    // cyan-900/800
+    nft: { bg: '#831843', border: '#9d174d', text: '#ffff' },        // pink-900/800
+    bridges: { bg: '#312e81', border: '#3730a3', text: '#ffff' },    // indigo-900/800
+    yield: { bg: '#713f12', border: '#854d0e', text: '#ffff' },      // yellow-900/800
+    perpetuals: { bg: '#7c2d12', border: '#9a3412', text: '#ffff' }, // orange-900/800
+    derivatives: { bg: '#7f1d1d', border: '#991b1b', text: '#ffff' },// red-900/800
+    default: { bg: '#1f2937', border: '#374151', text: '#9ca3af' },  // gray-800/700
 };
 
 // Get color based on performance change
 function getChangeColors(change?: number) {
     if (change === undefined || change === null) return CATEGORY_COLORS.default;
-    if (change >= 5) return { bg: 'rgba(34, 197, 94, 0.35)', border: 'rgba(34, 197, 94, 0.6)', text: '#22c55e' };
-    if (change >= 0) return { bg: 'rgba(34, 197, 94, 0.2)', border: 'rgba(34, 197, 94, 0.4)', text: '#4ade80' };
-    if (change >= -5) return { bg: 'rgba(239, 68, 68, 0.2)', border: 'rgba(239, 68, 68, 0.4)', text: '#f87171' };
-    return { bg: 'rgba(239, 68, 68, 0.35)', border: 'rgba(239, 68, 68, 0.6)', text: '#ef4444' };
+    // Solid colors for heatmap
+    if (change >= 5) return { bg: '#16a34a', border: '#22c55e', text: '#ffffff' };  // green-600
+    if (change >= 0) return { bg: '#064e3b', border: '#065f46', text: '#e2e8f0' };  // green-900 (darker for small gains)
+    if (change >= -5) return { bg: '#450a0a', border: '#7f1d1d', text: '#e2e8f0' }; // red-950 (darker for small losses)
+    return { bg: '#b91c1c', border: '#dc2626', text: '#ffffff' };                   // red-700
 }
 
 // ============================================
@@ -371,19 +372,19 @@ export function EcosystemTreemap({
             {colorMode === 'performance' && (
                 <div className="flex items-center justify-center gap-6 mt-5 text-xs">
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-green-500/35 ring-1 ring-green-500/60" />
+                        <span className="w-3 h-3 rounded" style={{ background: '#16a34a', border: '1px solid #22c55e' }} />
                         <span className="text-white/40">+5% or more</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-green-500/20 ring-1 ring-green-500/40" />
+                        <span className="w-3 h-3 rounded" style={{ background: '#064e3b', border: '1px solid #065f46' }} />
                         <span className="text-white/40">0% to +5%</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-red-500/20 ring-1 ring-red-500/40" />
+                        <span className="w-3 h-3 rounded" style={{ background: '#450a0a', border: '1px solid #7f1d1d' }} />
                         <span className="text-white/40">0% to -5%</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-red-500/35 ring-1 ring-red-500/60" />
+                        <span className="w-3 h-3 rounded" style={{ background: '#b91c1c', border: '1px solid #dc2626' }} />
                         <span className="text-white/40">-5% or more</span>
                     </div>
                 </div>

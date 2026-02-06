@@ -5,7 +5,6 @@ export { default as ShieldIcon } from './ShieldIcon';
 export { default as ChecklistIcon } from './ChecklistIcon';
 export { default as FlagIcon } from './FlagIcon';
 export { default as BriefcaseIcon } from './BriefcaseIcon';
-export { default as AnalyticsIcon } from './AnalyticsIcon';
 export { default as DatabaseIcon } from './DatabaseIcon';
 
 // Action icons

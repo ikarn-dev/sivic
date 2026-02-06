@@ -11,7 +11,6 @@ import {
   ShieldIcon,
   ChecklistIcon,
   DatabaseIcon,
-  AnalyticsIcon,
 } from './icons';
 
 // Chevron icon for expand/collapse
@@ -37,7 +36,6 @@ const ChevronIcon = ({ expanded }: { expanded: boolean }) => (
 // Navigation items - Overview first, then alphabetical
 const navigationItems = [
   { name: 'Overview', href: '/', Icon: DashboardIcon },
-  { name: 'Analytics', href: '/analytics', Icon: AnalyticsIcon },
   { name: 'Exploit Detector', href: '/exploit-detector', Icon: ShieldIcon },
   { name: 'MEV Shield', href: '/mev-shield', Icon: ScanIcon },
   { name: 'Pre-Audit', href: '/pre-audit', Icon: ChecklistIcon },

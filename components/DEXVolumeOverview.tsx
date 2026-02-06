@@ -39,7 +39,7 @@ export function DEXVolumeOverview({ isLoading, totalVolume24h, dexes, maxItems =
                     </div>
 
                     {/* DEX List */}
-                    <div className="space-y-2 max-h-[180px] overflow-y-auto hide-scrollbar">
+                    <div className="space-y-2 max-h-[280px] overflow-y-auto hide-scrollbar pr-1">
                         {dexes?.slice(0, maxItems).map((dex, index) => (
                             <div
                                 key={dex.name}
