@@ -72,15 +72,13 @@ export function EducationalAccordion({
     className = '',
 }: EducationalAccordionProps) {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
-    const [activeCategory, setActiveCategory] = useState<'all' | 'basics' | 'protection' | 'advanced'>('all');
+    const [activeCategory, setActiveCategory] = useState<'basics' | 'protection' | 'advanced'>('basics');
 
     const toggleItem = useCallback((index: number) => {
         setOpenIndex(prev => prev === index ? null : index);
     }, []);
 
-    const filteredItems = activeCategory === 'all'
-        ? items
-        : items.filter(item => item.category === activeCategory);
+    const filteredItems = items.filter(item => item.category === activeCategory);
 
     const getCategoryColor = (category: string) => {
         switch (category) {
@@ -109,7 +107,7 @@ export function EducationalAccordion({
             <div className="space-y-4">
                 {/* Category Filter */}
                 <div className="flex flex-wrap gap-2">
-                    {(['all', 'basics', 'protection', 'advanced'] as const).map((category) => (
+                    {(['basics', 'protection', 'advanced'] as const).map((category) => (
                         <button
                             key={category}
                             onClick={() => {
@@ -121,7 +119,7 @@ export function EducationalAccordion({
                                 : 'bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:border-[rgba(255,255,255,0.2)]'
                                 }`}
                         >
-                            {category === 'all' ? 'All Topics' : getCategoryLabel(category)}
+                            {getCategoryLabel(category)}
                         </button>
                     ))}
                 </div>
