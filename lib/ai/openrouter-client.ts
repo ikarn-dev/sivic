@@ -43,9 +43,10 @@ const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Verified free models - Updated Feb 2026
 const FREE_MODELS = [
-    'google/gemma-3-27b-it:free',                         // Gemma 3 27B Instruct (reliable)
-    'mistralai/mistral-nemo:free',                        // Mistral Nemo
-    'openrouter/pony-alpha',                              // Pony Alpha (can be rate limited)
+    'mistralai/mistral-small-3.1-24b-instruct:free',      // Mistral Small 3.1 24B (reliable, fast)
+    'meta-llama/llama-3.3-70b-instruct:free',             // Meta Llama 3.3 70B (high quality)
+    'deepseek/deepseek-chat-v3-0324:free',                // DeepSeek Chat V3 (good for analysis)
+    'google/gemma-3-12b:free',                            // Google Gemma 3 12B (lightweight, fast)
 ];
 
 // Concise system prompt (fewer tokens = faster)
@@ -132,19 +133,12 @@ async function generateWithModel(
             { role: 'user', content: userPrompt }
         ];
 
-        const isPonyAlpha = model.includes('pony-alpha');
-
         const requestBody: any = {
             model,
             messages,
             max_tokens: 300,
             temperature: 0.1,
         };
-
-        // Enable reasoning for alpha models
-        if (isPonyAlpha) {
-            requestBody.reasoning = { enabled: true };
-        }
 
         const response = await fetch(OPENROUTER_API_URL, {
             method: 'POST',
