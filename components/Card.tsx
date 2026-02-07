@@ -221,10 +221,10 @@ interface StatCardProps {
  */
 export function StatCard({ title, value, className = '' }: StatCardProps) {
   return (
-    <Card className={`p-6 ${className}`} hover={true}>
+    <Card className={`p-4 sm:p-6 ${className}`} hover={true}>
       <div className="flex flex-col justify-end h-full">
-        <p className="text-white/60 text-sm font-medium tracking-wide mb-2">{title}</p>
-        <h3 className="text-white text-3xl font-bold tracking-tight">{value}</h3>
+        <p className="text-white/60 text-xs sm:text-sm font-medium tracking-wide mb-1 sm:mb-2 font-nohemi">{title}</p>
+        <h3 className="text-white text-2xl sm:text-3xl font-bold tracking-tight font-satoshi">{value}</h3>
       </div>
     </Card>
   );
@@ -268,10 +268,10 @@ export function GlassStatCard({
   };
 
   return (
-    <Card className={`p-6 ${variantStyles[variant]} ${className}`} hover={true}>
-      <div className="flex flex-col justify-end h-full min-h-[80px]">
-        <p className="text-white/60 text-sm font-medium tracking-wide mb-2">{title}</p>
-        <h3 className={`font-bold tracking-tight ${valueColors[variant]} ${large ? 'text-4xl' : 'text-3xl'}`}>
+    <Card className={`p-4 sm:p-6 ${variantStyles[variant]} ${className}`} hover={true}>
+      <div className="flex flex-col justify-end h-full min-h-[50px] sm:min-h-[80px]">
+        <p className="text-white/60 text-[10px] sm:text-sm font-medium tracking-wide mb-0.5 sm:mb-2 font-nohemi">{title}</p>
+        <h3 className={`font-bold tracking-tight font-satoshi ${valueColors[variant]} ${large ? 'text-xl sm:text-4xl' : 'text-lg sm:text-3xl'}`}>
           {value}
         </h3>
       </div>
@@ -295,11 +295,11 @@ interface GlassContainerCardProps {
  */
 export function GlassContainerCard({ children, title, className = '' }: GlassContainerCardProps) {
   return (
-    <Card className={`p-6 ${className}`} hover={false} blobIntensity="subtle">
+    <Card className={`p-4 sm:p-6 ${className}`} hover={false} blobIntensity="subtle">
       {title && (
-        <h2 className="text-xl font-semibold text-white mb-6">{title}</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 font-nohemi">{title}</h2>
       )}
-      <div className="relative z-10">
+      <div className="relative z-10 font-satoshi">
         {children}
       </div>
     </Card>
@@ -315,7 +315,7 @@ interface GlassContainerEmptyProps {
  */
 export function GlassContainerEmpty({ message = 'No data available' }: GlassContainerEmptyProps) {
   return (
-    <div className="flex items-center justify-center min-h-[100px] text-white/30 text-sm">
+    <div className="flex items-center justify-center min-h-[80px] sm:min-h-[100px] text-white/30 text-sm font-satoshi">
       {message}
     </div>
   );

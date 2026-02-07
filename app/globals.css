@@ -2,6 +2,54 @@
 @import "./css/glass-card.css";
 
 /* ========================================
+   Satoshi Font Family
+   ======================================== */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Light.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Regular.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Medium.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Bold.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Black.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========================================
    Nohemi Font Family
    ======================================== */
 @font-face {
@@ -47,6 +95,56 @@
 @font-face {
   font-family: 'Nohemi';
   src: url('/fonts/nohemi-font-family/Nohemi-Light-BF6438cc5702321.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========================================
+   Ahsing Font Family (Logo)
+   ======================================== */
+@font-face {
+  font-family: 'Ahsing';
+  src: url('/fonts/ahsing-font/typogama-ahsing.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ========================================
+   Satoshi Font Family (Body/Data Text)
+   ======================================== */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Regular.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Medium.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Bold.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Light.woff2') format('woff2'),
+    url('/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Light.woff') format('woff');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -209,21 +307,49 @@ body {
   padding: 1.5rem;
 }
 
-/* Tablet: smaller sidebar offset */
+/* Tablet/Mobile: no sidebar, bottom navbar + top header */
 @media (max-width: 1023px) {
   .main-content {
-    margin-left: 4rem;
-    /* 64px = w-16 */
+    margin-left: 0;
     padding: 1rem;
+    padding-top: 5rem;
+    /* Space for mobile header (h-14 = 56px + 24px buffer) */
+    padding-bottom: 5rem;
+    /* Space for bottom navbar */
   }
 }
 
-/* Mobile: no sidebar offset, minimal padding */
-@media (max-width: 767px) {
+/* Mobile: tighter horizontal padding but preserve vertical */
+@media (max-width: 640px) {
   .main-content {
-    margin-left: 4rem;
-    padding: 0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 5rem;
+    /* Preserve top spacing */
+    padding-bottom: 5rem;
   }
+}
+
+/* ========================================
+   Safe Area for iPhone Notch
+   ======================================== */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* ========================================
+   Font Family Utilities
+   ======================================== */
+.font-satoshi {
+  font-family: 'Satoshi', system-ui, sans-serif;
+}
+
+.font-nohemi {
+  font-family: 'Nohemi', system-ui, sans-serif;
+}
+
+.font-ahsing {
+  font-family: 'Ahsing', system-ui, sans-serif;
 }
 
 /* ========================================

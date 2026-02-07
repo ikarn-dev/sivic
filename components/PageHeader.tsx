@@ -12,12 +12,17 @@ interface PageHeaderProps {
  */
 export function PageHeader({ title, description, rightContent }: PageHeaderProps) {
     return (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
-            <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">{title}</h1>
-                <p className="text-[#9ca3af] text-sm">{description}</p>
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
+            <div className="text-left">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 font-nohemi">{title}</h1>
+                <p className="text-[#9ca3af] text-[10px] sm:text-xs font-satoshi">{description}</p>
             </div>
-            {rightContent}
+            {/* Badge positioned in top-right on mobile, inline on desktop */}
+            {rightContent && (
+                <div className="absolute top-0 right-0 sm:relative sm:top-auto sm:right-auto">
+                    {rightContent}
+                </div>
+            )}
         </div>
     );
 }
@@ -28,13 +33,13 @@ interface ConnectionStatusBadgeProps {
 
 /**
  * Connection Status Badge Component
- * Displays connection status with animated dot
+ * Displays connection status with animated dot - compact design
  */
 export function ConnectionStatusBadge({ isConnected }: ConnectionStatusBadgeProps) {
     return (
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)]">
-            <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#4ade80]' : 'bg-[#6b7280]'} animate-pulse`}></span>
-            <span className="text-[#9ca3af] text-sm">
+        <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)]">
+            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-[#4ade80]' : 'bg-[#6b7280]'} animate-pulse`}></span>
+            <span className="text-[#9ca3af] text-[10px] sm:text-xs">
                 {isConnected ? 'Connected' : 'Connecting...'}
             </span>
         </div>

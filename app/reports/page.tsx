@@ -43,16 +43,16 @@ const classificationConfig: Record<string, { color: string; label: string }> = {
     'Smart Contract Language': { color: '#a78bfa', label: 'Smart Contract' },
 };
 
-// Target type icons
-const targetTypeIcons: Record<string, string> = {
-    'DeFi Protocol': '🏦',
-    'CEX': '🏢',
-    'Wallet': '👛',
-    'Bridge': '🌉',
-    'Gaming': '🎮',
-    'NFTfi': '🖼️',
-    'DAO': '🏛️',
-    'Other': '📦',
+// Target type labels (no emojis)
+const targetTypeLabels: Record<string, string> = {
+    'DeFi Protocol': 'DeFi',
+    'CEX': 'CEX',
+    'Wallet': 'Wallet',
+    'Bridge': 'Bridge',
+    'Gaming': 'Gaming',
+    'NFTfi': 'NFT',
+    'DAO': 'DAO',
+    'Other': 'Other',
 };
 
 // Format currency
@@ -77,14 +77,14 @@ function formatDate(dateStr: string): string {
 // Exploit card component
 function ExploitCard({ exploit }: { exploit: Exploit }) {
     const classification = classificationConfig[exploit.classification || ''] || { color: '#94a3b8', label: exploit.classification };
-    const targetIcon = targetTypeIcons[exploit.targetType || 'Other'] || '📦';
+    const targetLabel = targetTypeLabels[exploit.targetType || 'Other'] || 'Other';
     const isSolana = exploit.chain.some(c => c.toLowerCase() === 'solana');
 
     return (
         <Card className="p-5 ring-1 ring-white/5 hover:ring-orange-500/30 transition-all duration-300" hover={true} blobIntensity="subtle" rounded="lg">
             <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                    <span className="text-2xl">{targetIcon}</span>
+                    <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/70 font-medium">{targetLabel}</span>
                     <div>
                         <h3 className="text-white font-semibold">
                             {exploit.name}
@@ -105,7 +105,6 @@ function ExploitCard({ exploit }: { exploit: Exploit }) {
             </div>
 
             <div className="flex flex-wrap gap-2 mb-3">
-                {/* Classification badge */}
                 <span
                     className="px-2.5 py-1 rounded-full text-xs font-medium"
                     style={{ backgroundColor: `${classification.color}20`, color: classification.color }}
@@ -113,7 +112,6 @@ function ExploitCard({ exploit }: { exploit: Exploit }) {
                     {classification.label}
                 </span>
 
-                {/* Chain badges */}
                 {exploit.chain.slice(0, 3).map((chain) => (
                     <span
                         key={chain}
@@ -131,33 +129,29 @@ function ExploitCard({ exploit }: { exploit: Exploit }) {
                     </span>
                 )}
 
-                {/* Bridge hack indicator */}
                 {exploit.bridgeHack && (
                     <span className="px-2.5 py-1 rounded-full text-xs bg-red-500/20 text-red-400">
-                        🌉 Bridge
+                        Bridge
                     </span>
                 )}
 
-                {/* Solana highlight */}
                 {isSolana && (
                     <span className="px-2.5 py-1 rounded-full text-xs bg-purple-500/20 text-purple-400 font-semibold">
-                        ⚡ Solana
+                        Solana
                     </span>
                 )}
             </div>
 
-            {/* Technique */}
             {exploit.technique && (
                 <p className="text-white/60 text-sm mb-3">
                     <span className="text-white/40">Technique:</span> {exploit.technique}
                 </p>
             )}
 
-            {/* Language and source */}
             <div className="flex items-center justify-between">
                 {exploit.language && (
                     <span className="text-white/40 text-xs">
-                        📝 {exploit.language}
+                        {exploit.language}
                     </span>
                 )}
                 {exploit.source && (
@@ -185,7 +179,7 @@ export default function ExploitDatabasePage() {
     const [selectedChain, setSelectedChain] = useState('');
     const [selectedTechnique, setSelectedTechnique] = useState('');
     const [minAmount, setMinAmount] = useState('');
-    const [solanaOnly, setSolanaOnly] = useState(false);
+    const [solanaOnly, setSolanaOnly] = useState(true);
     const [limit, setLimit] = useState(50);
 
     // Fetch exploits
@@ -277,15 +271,15 @@ export default function ExploitDatabasePage() {
                     title="Exploit Database"
                     description="Historical blockchain exploits, hacks, and security incidents from DeFiLlama"
                     rightContent={
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <SecondaryButton
                                 onClick={() => setSolanaOnly(!solanaOnly)}
                                 className={solanaOnly ? '!bg-[rgba(153,69,255,0.2)] !border-[#9945ff]' : ''}
                             >
-                                {solanaOnly ? '⚡ Solana Only' : 'All Chains'}
+                                {solanaOnly ? 'Solana Only' : 'All Chains'}
                             </SecondaryButton>
                             <PrimaryButton onClick={handleApplyFilters}>
-                                🔄 Refresh
+                                Refresh
                             </PrimaryButton>
                         </div>
                     }
@@ -326,26 +320,14 @@ export default function ExploitDatabasePage() {
                 </div>
 
                 {/* Filters */}
-                <GlassContainerCard title="🔍 Filter Exploits">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <GlassContainerCard title="Filter Exploits">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormInput
                             label="Search"
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Protocol name, technique..."
-                        />
-                        <FormSelect
-                            label="Chain"
-                            value={selectedChain}
-                            options={chainOptions}
-                            onChange={(e) => setSelectedChain(e.target.value)}
-                        />
-                        <FormSelect
-                            label="Attack Technique"
-                            value={selectedTechnique}
-                            options={techniqueOptions}
-                            onChange={(e) => setSelectedTechnique(e.target.value)}
                         />
                         <FormInput
                             label="Min Amount (USD)"
@@ -368,7 +350,7 @@ export default function ExploitDatabasePage() {
                 {/* Data Sources Info */}
                 <Card className="p-5 ring-1 ring-orange-500/30" hover={false} blobIntensity="subtle" rounded="lg">
                     <div className="flex items-center gap-3">
-                        <span className="text-2xl">📊</span>
+                        <span className="text-2xl">i</span>
                         <div>
                             <h3 className="text-white font-semibold">Data Sources</h3>
                             <p className="text-white/60 text-sm mt-1">
@@ -381,7 +363,7 @@ export default function ExploitDatabasePage() {
                 </Card>
 
                 {/* Exploits List */}
-                <GlassContainerCard title={`📋 Recent Exploits (${data?.exploits?.length || 0} shown)`}>
+                <GlassContainerCard title={`Recent Exploits (${data?.exploits?.length || 0} shown)`}>
                     {isLoading ? (
                         <div className="flex items-center justify-center py-12">
                             <div className="animate-spin w-8 h-8 border-2 border-[#f97316] border-t-transparent rounded-full" />
@@ -416,7 +398,7 @@ export default function ExploitDatabasePage() {
                         </div>
                     ) : (
                         <div className="text-center py-12 text-[rgba(255,255,255,0.5)]">
-                            <p className="text-4xl mb-4">🔍</p>
+                            <p className="text-4xl mb-4">?</p>
                             <p>No exploits match your filters.</p>
                             <p className="text-sm mt-2">Try adjusting your search criteria.</p>
                         </div>
@@ -425,7 +407,7 @@ export default function ExploitDatabasePage() {
 
                 {/* Educational Footer */}
                 <Card className="p-6" hover={false} blobIntensity="subtle" rounded="lg">
-                    <h3 className="text-white font-semibold text-lg mb-4">📚 Understanding Exploit Classifications</h3>
+                    <h3 className="text-white font-semibold text-lg mb-4">Understanding Exploit Classifications</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {Object.entries(classificationConfig).map(([key, { color, label }]) => (
                             <div key={key} className="flex items-center gap-2">

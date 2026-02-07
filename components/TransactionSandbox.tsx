@@ -1,9 +1,8 @@
-'use client';
-
 import { useState } from 'react';
 import { GlassContainerCard, GlassContainerEmpty } from '@/components/Card';
 import { FormTextarea, PrimaryButton, SecondaryButton } from '@/components/FormElements';
 import { toast } from 'sonner';
+import { AIAnalysisCard } from '@/components/AnalysisTimeline';
 
 // Types matching API response
 interface MEVThreat {
@@ -30,6 +29,13 @@ interface MEVAnalysisResult {
         isDexTransaction: boolean;
         innerInstructionsCount?: number;
     };
+    // AI Analysis
+    aiAnalysis?: {
+        summary: string;
+        riskAssessment: string;
+        keyFindings: string[];
+        recommendations: string[];
+    };
 }
 
 interface TransactionSandboxProps {
@@ -44,6 +50,7 @@ interface TransactionSandboxProps {
 export function TransactionSandbox({ className = '' }: TransactionSandboxProps) {
     const [transaction, setTransaction] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [isAIAnalyzing, setIsAIAnalyzing] = useState(false);
     const [result, setResult] = useState<MEVAnalysisResult | null>(null);
 
     const handleAnalyze = async () => {
@@ -54,8 +61,10 @@ export function TransactionSandbox({ className = '' }: TransactionSandboxProps) 
 
         setIsAnalyzing(true);
         setResult(null);
+        setIsAIAnalyzing(false);
 
         try {
+            // Step 1: Standard MEV Analysis
             const response = await fetch('/api/mev-analysis', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -84,6 +93,32 @@ export function TransactionSandbox({ className = '' }: TransactionSandboxProps) 
                     description: `Risk Score: ${data.riskScore}/100 (${data.riskLevel})`,
                 });
             }
+
+            // Step 2: AI Analysis (OpenRouter)
+            setIsAIAnalyzing(true);
+            try {
+                const aiResponse = await fetch('/api/ai/mev-analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mevData: data }),
+                });
+
+                if (aiResponse.ok) {
+                    const aiResult = await aiResponse.json();
+                    setResult(prev => prev ? ({ ...prev, aiAnalysis: aiResult }) : null);
+                    toast.success('AI Report Generated', {
+                        description: 'Powered by OpenRouter'
+                    });
+                } else {
+                    console.error('AI Analysis failed');
+                    // Silently fail or show minor toast, main analysis already shown
+                }
+            } catch (aiError) {
+                console.error('AI Analysis error:', aiError);
+            } finally {
+                setIsAIAnalyzing(false);
+            }
+
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to analyze transaction';
             toast.error('Analysis Error', { description: message });
@@ -95,6 +130,7 @@ export function TransactionSandbox({ className = '' }: TransactionSandboxProps) 
     const handleClear = () => {
         setTransaction('');
         setResult(null);
+        setIsAIAnalyzing(false);
     };
 
     const getRiskColor = (level: string) => {
@@ -171,6 +207,21 @@ export function TransactionSandbox({ className = '' }: TransactionSandboxProps) 
                 {/* Results Section */}
                 {result && (
                     <div className="space-y-4 pt-4 border-t border-[rgba(255,255,255,0.1)]">
+                        {/* AI Analysis Card */}
+                        {result.aiAnalysis ? (
+                            <AIAnalysisCard data={{ aiAnalysis: result.aiAnalysis } as any} />
+                        ) : isAIAnalyzing ? (
+                            <div className="p-6 rounded-lg border border-purple-500/20 bg-purple-500/5 animate-pulse">
+                                <div className="flex items-center justify-center gap-3 text-purple-300">
+                                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                    </svg>
+                                    <span className="font-medium text-sm">Generating AI Report...</span>
+                                </div>
+                            </div>
+                        ) : null}
+
                         {/* Risk Score Header */}
                         <div className={`p-4 rounded-lg border ${getRiskBgColor(result.riskLevel)}`}>
                             <div className="flex items-center justify-between">
@@ -299,5 +350,6 @@ export function TransactionSandbox({ className = '' }: TransactionSandboxProps) 
         </GlassContainerCard>
     );
 }
+
 
 export default TransactionSandbox;

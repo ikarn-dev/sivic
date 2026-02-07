@@ -73,6 +73,10 @@ export interface AnalysisData {
         discord?: string;
         createdAt?: number;
         ageInDays?: number;
+        // DEX program fields
+        programId?: string;
+        programName?: string;
+        ownerProgram?: string;
     };
 
     misc: {
@@ -132,8 +136,9 @@ export interface AnalysisData {
         rugCheckRiskLevel?: 'safe' | 'caution' | 'danger' | 'unknown';
     };
 
-    // DEX data (from DexScreener)
+    // DEX data (from DexScreener or DEX detector)
     dexData?: {
+        // Token-focused fields
         totalPairs?: number;
         totalLiquidity?: number;
         totalVolume24h?: number;
@@ -146,6 +151,14 @@ export interface AnalysisData {
             volume24h: number;
             quoteToken: string;
         }>;
+        // DEX program fields
+        tvl?: number;
+        volume24h?: number;
+        transactionCount?: number;
+        errorRate?: number;
+        programName?: string;
+        isUpgradeable?: boolean;
+        upgradeAuthority?: string | null;
     };
 
     // Slippage data (from Jupiter)
@@ -560,16 +573,33 @@ export function ProfileSummaryCard({ data }: { data: AnalysisData }) {
                 )}
                 {type === 'program' && (
                     <>
+                        {profileSummary.programName && (
+                            <DataRow
+                                label="Program Name"
+                                value={profileSummary.programName}
+                                valueClass="text-white"
+                            />
+                        )}
                         <DataRow
                             label="Upgradeable"
                             value={profileSummary.isUpgradeable ? 'Yes' : 'No'}
-                            valueClass="text-white"
+                            valueClass={profileSummary.isUpgradeable ? 'text-yellow-400' : 'text-green-400'}
                         />
-                        <DataRow
-                            label="Upgrade Authority"
-                            value={profileSummary.upgradeAuthority?.slice(0, 12) + '...' || 'None'}
-                            mono
-                        />
+                        {profileSummary.upgradeAuthority && (
+                            <DataRow
+                                label="Upgrade Authority"
+                                value={profileSummary.upgradeAuthority.slice(0, 12) + '...'}
+                                mono
+                                copyable={profileSummary.upgradeAuthority}
+                            />
+                        )}
+                        {profileSummary.ownerProgram && (
+                            <DataRow
+                                label="Owner Program"
+                                value={profileSummary.ownerProgram.slice(0, 16) + '...'}
+                                mono
+                            />
+                        )}
                     </>
                 )}
             </div>
@@ -596,16 +626,18 @@ export function MiscCard({ data }: { data: AnalysisData }) {
 
             <div className="space-y-3">
                 <DataRow
-                    label="Token address"
+                    label={data.type === 'program' ? 'Program address' : 'Token address'}
                     value={`${data.address.slice(0, 4)}...${data.address.slice(-5)}`}
                     mono
                     copyable={data.address}
                 />
-                <DataRow
-                    label="Owner Program"
-                    value={ownerProgram ? `${ownerProgram.slice(0, 12)}...` : '-'}
-                    mono
-                />
+                {data.type !== 'program' && ownerProgram && (
+                    <DataRow
+                        label="Owner Program"
+                        value={`${ownerProgram.slice(0, 12)}...`}
+                        mono
+                    />
+                )}
             </div>
         </div>
     );
@@ -661,15 +693,49 @@ export function TradingDataCard({ data }: { data: AnalysisData }) {
                 {/* DEX Data */}
                 {dexData && (
                     <>
-                        <DataRow
-                            label="DEXes"
-                            value={dexData.dexes?.join(', ') || '-'}
-                            valueClass="text-white capitalize"
-                        />
-                        <DataRow
-                            label="Pairs"
-                            value={dexData.totalPairs?.toString() || '-'}
-                        />
+                        {/* Token DEX info */}
+                        {dexData.dexes && dexData.dexes.length > 0 && (
+                            <DataRow
+                                label="DEXes"
+                                value={dexData.dexes.join(', ')}
+                                valueClass="text-white capitalize"
+                            />
+                        )}
+                        {dexData.totalPairs !== undefined && (
+                            <DataRow
+                                label="Pairs"
+                                value={dexData.totalPairs.toString()}
+                            />
+                        )}
+                        {/* DEX program fields */}
+                        {dexData.transactionCount !== undefined && (
+                            <DataRow
+                                label="Transactions"
+                                value={dexData.transactionCount.toLocaleString()}
+                                valueClass="text-white"
+                            />
+                        )}
+                        {dexData.errorRate !== undefined && (
+                            <DataRow
+                                label="Error Rate"
+                                value={`${dexData.errorRate.toFixed(1)}%`}
+                                valueClass={dexData.errorRate > 10 ? 'text-red-400' : 'text-white'}
+                            />
+                        )}
+                        {dexData.tvl !== undefined && dexData.tvl > 0 && (
+                            <DataRow
+                                label="TVL"
+                                value={`$${formatNumber(dexData.tvl)}`}
+                                valueClass="text-white"
+                            />
+                        )}
+                        {dexData.volume24h !== undefined && dexData.volume24h > 0 && (
+                            <DataRow
+                                label="Volume 24h"
+                                value={`$${formatNumber(dexData.volume24h)}`}
+                                valueClass="text-white"
+                            />
+                        )}
                     </>
                 )}
             </div>
@@ -898,6 +964,7 @@ export function AIAnalysisCard({ data }: { data: AnalysisData }) {
     return (
         <div className="rounded-lg p-6 relative overflow-hidden group mb-6"
             style={{
+                fontFamily: 'Satoshi, sans-serif',
                 background: 'linear-gradient(135deg, rgba(8,8,20,0.9) 0%, rgba(13,17,23,0.95) 100%)',
                 border: '1px solid rgba(139, 92, 246, 0.3)', // Purple border for AI
                 boxShadow: '0 0 20px rgba(139, 92, 246, 0.1)'
@@ -920,7 +987,23 @@ export function AIAnalysisCard({ data }: { data: AnalysisData }) {
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
                         </span>
-                        <p className="text-purple-300/80 text-xs font-medium uppercase tracking-wider">Powered by Puter.js</p>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-purple-300/80 text-xs font-medium uppercase tracking-wider">Powered by</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-400/30">
+                                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="url(#openrouter-gradient)" strokeWidth="2" />
+                                    <path d="M8 12L11 15L16 9" stroke="url(#openrouter-gradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <defs>
+                                        <linearGradient id="openrouter-gradient" x1="2" y1="2" x2="22" y2="22">
+                                            <stop stopColor="#10B981" />
+                                            <stop offset="0.5" stopColor="#06B6D4" />
+                                            <stop offset="1" stopColor="#3B82F6" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <span className="text-xs font-semibold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">OpenRouter</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

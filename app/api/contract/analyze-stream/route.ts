@@ -13,7 +13,6 @@ import { NextRequest } from 'next/server';
 import { TokenDetector } from '@/lib/detection/token-detector';
 import { DexDetector } from '@/lib/detection/dex-detector';
 import * as birdeye from '@/lib/api/birdeye';
-// AI Client removed (Client-side Puter.js used instead)
 
 // ===========================================
 // RPC CONFIGURATION
@@ -374,6 +373,10 @@ export async function GET(request: NextRequest) {
                             transactionCount: dexResult.dexData.transactionCount,
                             errorRate: dexResult.dexData.recentErrorRate,
                         },
+
+                        // Params for display
+                        onChainParams: dexResult.onChainParams,
+                        offChainParams: dexResult.offChainParams,
 
                         // Misc data
                         misc: {

@@ -1,0 +1,15 @@
+<svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 0L32 6V16C32 26.5 24 33 16 36C8 33 0 26.5 0 16V6L16 0Z" fill="url(#shield_gradient)"/>
+  <path d="M16 3L29 8V16C29 24.5 22.5 30 16 33C9.5 30 3 24.5 3 16V8L16 3Z" fill="#0a0a0a"/>
+  <path d="M16 6L26 10V16C26 22.5 21 27.5 16 30C11 27.5 6 22.5 6 16V10L16 6Z" fill="url(#shield_inner_gradient)"/>
+  <defs>
+    <linearGradient id="shield_gradient" x1="16" y1="0" x2="16" y2="36" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316"/>
+      <stop offset="1" stop-color="#EA580C"/>
+    </linearGradient>
+    <linearGradient id="shield_inner_gradient" x1="16" y1="6" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F97316" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#EA580C" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+</svg>

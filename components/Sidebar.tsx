@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { socialLinks } from './Footer';
+import Logo from './Logo';
 
 // Import SVG icons from separate component files
 import {
@@ -13,27 +14,7 @@ import {
   DatabaseIcon,
 } from './icons';
 
-// Chevron icon for expand/collapse
-const ChevronIcon = ({ expanded }: { expanded: boolean }) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-  >
-    <path
-      d="M6 4l4 4-4 4"
-      stroke="#9ca3af"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-// Navigation items - Overview first, then alphabetical
+// Navigation items
 const navigationItems = [
   { name: 'Overview', href: '/', Icon: DashboardIcon },
   { name: 'Exploit Detector', href: '/exploit-detector', Icon: ShieldIcon },
@@ -44,12 +25,9 @@ const navigationItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState(false);
 
-  // Unified nav item renderer - same style for ALL items
-  const renderNavItem = (item: typeof navigationItems[0], isActive: boolean, isExpanded: boolean = true) => {
-    // Active: subtle glass background with border
-    // Inactive: transparent, gray icon and text
+  // Unified nav item renderer for desktop
+  const renderNavItem = (item: typeof navigationItems[0], isActive: boolean) => {
     const containerClasses = isActive
       ? 'bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.1)]'
       : 'bg-transparent border-transparent hover:bg-[rgba(255,255,255,0.03)]';
@@ -61,17 +39,14 @@ export default function Sidebar() {
     return (
       <Link
         href={item.href}
-        className={`group flex items-center gap-3 w-full rounded-lg transition-all duration-200 border ${containerClasses} ${isExpanded ? 'px-3 py-2.5' : 'justify-center p-2.5'}`}
+        className={`group flex items-center gap-3 w-full rounded-lg transition-all duration-200 border ${containerClasses} px-3 py-2.5`}
       >
-        {/* Icon - same size for all, color changes based on active state */}
         <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
           <item.Icon active={isActive} />
         </div>
-        {isExpanded && (
-          <span className={`text-[14px] font-medium transition-colors ${textClasses}`}>
-            {item.name}
-          </span>
-        )}
+        <span className={`text-[14px] font-medium transition-colors font-satoshi ${textClasses}`}>
+          {item.name}
+        </span>
       </Link>
     );
   };
@@ -80,15 +55,15 @@ export default function Sidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 h-screen sidebar-glass flex-col fixed left-0 top-0 z-50 overflow-y-auto">
-        {/* Logo/Brand Area - Centered */}
+        {/* Logo with Shield Icon */}
         <div className="px-5 pt-6 pb-4 flex justify-center">
-          <h1 className="text-2xl font-bold text-white tracking-tight">Sivic</h1>
+          <Logo size="lg" />
         </div>
 
-        {/* Gap between logo and menu */}
+        {/* Gap */}
         <div className="h-4" />
 
-        {/* Main Navigation - Unified styling for all items */}
+        {/* Navigation */}
         <nav className="flex-1 px-3">
           <ul className="space-y-1">
             {navigationItems.map((item) => {
@@ -100,59 +75,83 @@ export default function Sidebar() {
               );
             })}
           </ul>
+
+          {/* Docs Section */}
+          <div className="mt-6">
+            <div className="text-[11px] font-medium text-gray-500 px-3 mb-2 font-satoshi uppercase tracking-wider">
+              Resources
+            </div>
+            <Link
+              href="https://github.com/sivic"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 w-full rounded-lg transition-all duration-200 border bg-transparent border-transparent hover:bg-[rgba(255,255,255,0.03)] px-3 py-2.5"
+            >
+              <div className="w-6 h-6 flex items-center justify-center flex-shrink-0 text-gray-500 group-hover:text-white">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <span className="text-[14px] font-medium transition-colors font-satoshi text-[#9ca3af] group-hover:text-white">
+                Docs
+              </span>
+            </Link>
+          </div>
         </nav>
 
-        {/* Bottom spacing */}
-        <div className="h-6" />
-      </aside>
-
-      {/* Mobile Overlay Backdrop */}
-      {expanded && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
-          onClick={() => setExpanded(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Mobile/Tablet Sidebar */}
-      <aside
-        className={`lg:hidden fixed left-0 top-0 h-screen sidebar-glass flex flex-col z-50 overflow-y-auto transition-all duration-300 ease-out ${expanded ? 'w-64' : 'w-16'
-          }`}
-      >
-        {/* Toggle Button / Logo */}
-        <div className="flex items-center justify-center h-16 px-3 gap-2">
-          <h1 className={`font-bold text-white tracking-tight ${expanded ? 'text-xl flex-1 text-center' : 'text-sm'}`}>
-            {expanded ? 'Sivic' : 'S'}
-          </h1>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="p-2 rounded-xl hover:bg-white/5 transition-colors"
-            aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
-          >
-            <ChevronIcon expanded={expanded} />
-          </button>
+        {/* Social Links at Bottom */}
+        <div className="px-3 pb-6">
+          <div className="border-t border-white/5 pt-4">
+            <div className="flex items-center justify-center gap-3">
+              {socialLinks.slice(0, 4).map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-500 hover:text-white transition-colors duration-200 p-2 rounded-lg hover:bg-white/5"
+                  aria-label={social.name}
+                >
+                  <social.icon />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
-
-        {/* Gap between logo and menu */}
-        <div className="h-3" />
-
-        {/* Main Navigation - All items unified */}
-        <nav className="flex-1 px-2">
-          <ul className={`space-y-1 ${expanded ? '' : 'flex flex-col items-center'}`}>
-            {navigationItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <li key={item.name} className="w-full">
-                  <div onClick={() => expanded && setExpanded(false)}>
-                    {renderNavItem(item, isActive, expanded)}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
       </aside>
+
+      {/* Mobile Header with Logo */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-lg border-b border-white/10">
+        <div className="flex items-center justify-center h-14 px-4">
+          <Logo size="md" />
+        </div>
+      </header>
+
+      {/* Mobile Bottom Tab Navbar */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-lg border-t border-white/10 safe-area-bottom">
+        <div className="flex items-center justify-around h-16 px-2">
+          {navigationItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-xl transition-all duration-200 ${isActive
+                  ? 'text-white bg-white/10'
+                  : 'text-gray-500 hover:text-gray-300'
+                  }`}
+              >
+                <div className="w-5 h-5">
+                  <item.Icon active={isActive} />
+                </div>
+                <span className={`text-[10px] font-medium font-satoshi ${isActive ? 'text-white' : 'text-gray-500'}`}>
+                  {item.name.split(' ')[0]}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </>
   );
 }

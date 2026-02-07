@@ -2,8 +2,7 @@
  * Contract Audit API Route
  * 
  * Analyzes Solana smart contracts for vulnerabilities.
- * Note: AI-powered analysis is done client-side via Puter.js
- * This route provides heuristic-based analysis as a fallback.
+ * Provides heuristic-based analysis.
  * 
  * POST /api/contract-audit
  * Body: { contractAddress?: string, sourceCode?: string }
@@ -41,7 +40,6 @@ interface ErrorResponse {
 
 /**
  * Analyze contract using heuristics
- * Note: AI-powered analysis is done client-side via Puter.js
  */
 async function analyzeContract(
     input: { address?: string; code?: string },
@@ -144,7 +142,7 @@ function getSimulatedAuditReport(
         vulnerabilities,
         summary: `[HEURISTIC ANALYSIS] ${vulnerabilities.length > 0
             ? `Found ${vulnerabilities.length} potential issue(s). ${vulnerabilities.filter(v => v.severity === 'critical').length} critical, ${vulnerabilities.filter(v => v.severity === 'high').length} high severity.`
-            : 'No significant vulnerabilities detected in initial analysis.'} For AI-powered analysis, use client-side Puter.js integration.`,
+            : 'No significant vulnerabilities detected in initial analysis.'}`,
         gasOptimizations: hasCode ? [
             'Consider using PDAs instead of key pairs for derived accounts',
             'Batch similar operations to reduce transaction overhead',
@@ -224,8 +222,7 @@ export async function GET(): Promise<NextResponse> {
         status: 'ok',
         endpoint: '/api/contract-audit',
         method: 'POST',
-        aiProvider: 'puter.js (client-side)',
         acceptedInputs: ['contractAddress', 'sourceCode'],
-        message: 'Heuristic analysis available. AI-powered analysis via Puter.js on client-side.',
+        message: 'Heuristic analysis available.',
     });
 }

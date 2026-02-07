@@ -227,7 +227,7 @@ export default function PreAuditPage() {
                 <ProgressBar progress={checkedItems.size} max={allItems.length} />
 
                 {/* Project Details */}
-                <GlassContainerCard title="📝 Project Details">
+                <GlassContainerCard title="Project Details">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormInput
                             label="Project Name"
@@ -238,10 +238,10 @@ export default function PreAuditPage() {
                         />
                         <div className="flex items-end gap-2">
                             <SecondaryButton onClick={() => setShowTips(!showTips)}>
-                                {showTips ? '👁️ Hide Tips' : '💡 Show Tips'}
+                                {showTips ? 'Hide Tips' : 'Show Tips'}
                             </SecondaryButton>
                             <SecondaryButton onClick={handleReset}>
-                                🔄 Reset
+                                Reset
                             </SecondaryButton>
                         </div>
                     </div>
@@ -312,7 +312,7 @@ export default function PreAuditPage() {
                                             </div>
                                             {showTips && (
                                                 <p className="text-white/40 text-xs mt-2 italic">
-                                                    💡 {item.tip}
+                                                    Tip: {item.tip}
                                                 </p>
                                             )}
                                         </div>
@@ -326,22 +326,22 @@ export default function PreAuditPage() {
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3">
                     <PrimaryButton onClick={handleGenerateReport} className="flex-1">
-                        🤖 Generate AI Report
+                        Generate AI Report
                     </PrimaryButton>
                     <SecondaryButton onClick={handleExportPDF}>
-                        📄 Export PDF
+                        Export PDF
                     </SecondaryButton>
                     <SecondaryButton onClick={handleExportJSON}>
-                        📋 Export JSON
+                        Export JSON
                     </SecondaryButton>
                 </div>
 
                 {/* Next Steps */}
-                <GlassContainerCard title="🎯 Next Steps">
+                <GlassContainerCard title="Next Steps">
                     <div className="space-y-4">
                         {stats.readinessStatus === 'not-ready' && (
                             <Card className="p-5 ring-1 ring-red-500/30" hover={false} blobIntensity="subtle" rounded="md">
-                                <p className="text-white font-semibold mb-1">⚠️ Not Ready for Audit</p>
+                                <p className="text-white font-semibold mb-1">Not Ready for Audit</p>
                                 <p className="text-white/60 text-sm">
                                     Complete the critical items above before proceeding. Focus on the red-labeled items first.
                                 </p>
@@ -349,7 +349,7 @@ export default function PreAuditPage() {
                         )}
                         {stats.readinessStatus === 'partial' && (
                             <Card className="p-5 ring-1 ring-yellow-500/30" hover={false} blobIntensity="subtle" rounded="md">
-                                <p className="text-white font-semibold mb-1">📝 Almost There</p>
+                                <p className="text-white font-semibold mb-1">Almost There</p>
                                 <p className="text-white/60 text-sm">
                                     Good progress! Complete the remaining items, especially critical ones, to maximize your audit readiness.
                                 </p>
@@ -357,7 +357,7 @@ export default function PreAuditPage() {
                         )}
                         {stats.readinessStatus === 'ready' && (
                             <Card className="p-5 ring-1 ring-green-500/30" hover={false} blobIntensity="subtle" rounded="md">
-                                <p className="text-white font-semibold mb-1">✅ Ready for Professional Audit</p>
+                                <p className="text-white font-semibold mb-1">Ready for Professional Audit</p>
                                 <p className="text-white/60 text-sm">
                                     Congratulations! Your project meets the pre-audit requirements. You are now ready to engage with professional auditors.
                                 </p>

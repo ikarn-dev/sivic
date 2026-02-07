@@ -5,6 +5,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Sivic - Security Dashboard",
   description: "Solana Security Dashboard - Protect your investments with advanced security analysis",
+  icons: {
+    icon: "/shield_logo.svg",
+    shortcut: "/shield_logo.svg",
+    apple: "/shield_logo.svg",
+  },
 };
 
 export default function RootLayout({
@@ -18,7 +23,6 @@ export default function RootLayout({
         className="antialiased bg-[#0a0a0a] text-[#ededed]"
         style={{ fontFamily: "'Nohemi', system-ui, sans-serif" }}
       >
-        <script src="https://js.puter.com/v2/"></script>
         {children}
         <Toaster
           position="bottom-right"

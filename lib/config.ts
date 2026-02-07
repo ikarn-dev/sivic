@@ -32,8 +32,7 @@ export const serverConfig = {
         },
     },
 
-    // AI Configuration (Puter.js - client-side only, no server config needed)
-    // Puter.js handles AI inference on the client side without API keys
+    // AI Configuration - no server config needed
 
     // DeFiLlama (No API key needed)
     defillama: {

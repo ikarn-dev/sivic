@@ -74,14 +74,14 @@ interface ProgressBadgeProps {
 
 /**
  * Progress Badge Component
- * Premium progress badge display
+ * Premium progress badge display - compact on mobile
  */
 export function ProgressBadge({ current, total }: ProgressBadgeProps) {
     return (
-        <Card className="px-4 py-2.5" hover={false} blobIntensity="subtle" rounded="md">
-            <div className="flex items-center gap-2">
-                <span className="text-white/50 text-xs font-medium">Progress</span>
-                <span className="text-white font-bold">{current} / {total}</span>
+        <Card className="px-2.5 py-1.5 sm:px-4 sm:py-2.5" hover={false} blobIntensity="subtle" rounded="md">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-white/50 text-[10px] sm:text-xs font-medium">Progress</span>
+                <span className="text-white font-bold text-xs sm:text-base">{current} / {total}</span>
             </div>
         </Card>
     );

@@ -17,6 +17,7 @@ import { useDexVolumes } from '@/hooks/useDexVolumes';
 import { useProtocolsTreemap } from '@/hooks/useProtocolsTreemap';
 import { usePrefetch } from '@/hooks/usePrefetch';
 import { formatNumberExact, formatPercent, formatUSD } from '@/lib/utils/format';
+import { APIProvidersStrip } from '@/components/APIProvidersStrip';
 
 export default function Home() {
   // Warm the cache on first load
@@ -147,6 +148,9 @@ export default function Home() {
             message="Network data requires Helius API. Add your key to .env.local"
           />
         )}
+
+        {/* API Providers Strip */}
+        <APIProvidersStrip />
 
         {/* Primary Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
