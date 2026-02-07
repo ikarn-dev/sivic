@@ -99,10 +99,7 @@ export default function MEVShieldPage() {
                     <InfoCardGrid cards={mevAttackTypes} columns={4} />
                 </GlassContainerCard>
 
-                {/* MEV Attack Types Reference (Educational - static content) */}
-                <GlassContainerCard title="MEV Attack Types">
-                    <InfoCardGrid cards={mevAttackTypes} columns={4} />
-                </GlassContainerCard>
+
             </div>
         </DashboardLayout>
     );

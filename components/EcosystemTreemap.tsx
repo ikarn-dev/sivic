@@ -160,12 +160,16 @@ function Tooltip({ item, x, y }: TooltipProps) {
 
     const changeColor = item.change24h && item.change24h >= 0 ? 'text-[#4ade80]' : 'text-[#f87171]';
 
+    // Determine if cursor is on the right half of the screen
+    const isRightSide = typeof window !== 'undefined' ? x > window.innerWidth / 2 : false;
+
     return (
         <div
-            className="fixed z-50 pointer-events-none"
+            className="fixed z-50 pointer-events-none transition-transform duration-75"
             style={{
-                left: x + 12,
+                left: x,
                 top: y + 12,
+                transform: isRightSide ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)',
             }}
         >
             <div className="bg-[rgba(10,10,10,0.95)] backdrop-blur-lg border border-[rgba(255,255,255,0.15)] rounded-lg px-3 py-2 shadow-xl">
