@@ -1,11 +1,11 @@
 /**
- * OpenRouter AI Client - Optimized
+ * OpenRouter AI Client - NVIDIA Nemotron Model
  * 
  * Features:
- * - Multiple API keys with rotation (avoids rate limiting)
- * - Fast free models prioritized
- * - Minimal data payload for speed
- * - Fallback through all models and keys
+ * - Uses nvidia/nemotron-3-nano-30b-a3b:free model
+ * - Handles reasoning extraction from 'reasoning' or 'reasoning_details'
+ * - Multiple API keys with rotation
+ * - Robust error handling
  */
 
 // ===========================================
@@ -28,6 +28,8 @@ interface OpenRouterResponse {
     choices: {
         message: {
             content: string;
+            reasoning?: string; // Some models use this
+            reasoning_details?: any; // Others use this
         };
     }[];
     error?: {
@@ -41,17 +43,14 @@ interface OpenRouterResponse {
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Verified free models - Updated Feb 2026
-const FREE_MODELS = [
-    'mistralai/mistral-small-3.1-24b-instruct:free',      // Mistral Small 3.1 24B (reliable, fast)
-    'meta-llama/llama-3.3-70b-instruct:free',             // Meta Llama 3.3 70B (high quality)
-    'deepseek/deepseek-chat-v3-0324:free',                // DeepSeek Chat V3 (good for analysis)
-    'google/gemma-3-12b:free',                            // Google Gemma 3 12B (lightweight, fast)
-];
+// NVIDIA Nemotron - Free, fast, reasoning-capable
+const AI_MODEL = 'nvidia/nemotron-3-nano-30b-a3b:free'; 
 
-// Concise system prompt (fewer tokens = faster)
-const SYSTEM_PROMPT = `Solana security analyst. Return only JSON:
-{"summary":"2 short sentences","riskAssessment":"1 sentence","keyFindings":["f1","f2","f3"],"recommendations":["r1","r2","r3"]}`;
+const REQUEST_TIMEOUT_MS = 25000; // 25s should be enough for nano model
+
+const SYSTEM_PROMPT = `You are a Solana security analyst. Analyze the provided token/contract data and return ONLY a JSON object with this exact structure:
+{"summary":"2 sentence summary of security assessment","riskAssessment":"1 sentence overall risk verdict","keyFindings":["finding1","finding2","finding3"],"recommendations":["rec1","rec2","rec3"]}
+Do not include any text outside the JSON object.`;
 
 // ===========================================
 // API KEY MANAGEMENT
@@ -61,296 +60,273 @@ let currentKeyIndex = 0;
 
 function getAPIKeys(): string[] {
     const keys: string[] = [];
-
-    // Support up to 5 API keys
-    const key1 = process.env.OPENROUTER_API_KEY;
-    const key2 = process.env.OPENROUTER_API_KEY_2;
-    const key3 = process.env.OPENROUTER_API_KEY_3;
-    const key4 = process.env.OPENROUTER_API_KEY_4;
-    const key5 = process.env.OPENROUTER_API_KEY_5;
-
-    if (key1) keys.push(key1);
-    if (key2) keys.push(key2);
-    if (key3) keys.push(key3);
-    if (key4) keys.push(key4);
-    if (key5) keys.push(key5);
-
+    const envKeys = [
+        process.env.OPENROUTER_API_KEY,
+        process.env.OPENROUTER_API_KEY_2,
+        process.env.OPENROUTER_API_KEY_3,
+        process.env.OPENROUTER_API_KEY_4,
+        process.env.OPENROUTER_API_KEY_5
+    ];
+    envKeys.forEach(k => { if (k) keys.push(k); });
     return keys;
 }
 
 function getNextAPIKey(): string | null {
     const keys = getAPIKeys();
     if (keys.length === 0) return null;
-
-    // Round-robin rotation
     const key = keys[currentKeyIndex % keys.length];
     currentKeyIndex++;
     return key;
 }
 
 // ===========================================
-// MINIMAL DATA EXTRACTION
+// UTILS
 // ===========================================
 
 function extractMinimalData(detectionData: any): string {
-    // Only send essential data for analysis
     const minimal = {
         addr: detectionData.address?.slice(0, 12) + '...',
         type: detectionData.type || 'token',
         risk: detectionData.riskScore?.score || 0,
         grade: detectionData.riskScore?.grade || 'N/A',
-        // Security flags only (no raw data)
         flags: {
             mintAuth: detectionData.securityData?.mintAuthority ? 'enabled' : 'disabled',
             freezeAuth: detectionData.securityData?.freezeAuthority ? 'enabled' : 'disabled',
             mutable: detectionData.securityData?.mutable || false,
         },
-        // Market summary (minimal)
         market: {
             price: detectionData.marketOverview?.price || 0,
             mcap: detectionData.marketOverview?.marketCap || 0,
             liq: detectionData.marketOverview?.liquidity || 0,
         }
     };
-
     return JSON.stringify(minimal);
 }
 
-// ===========================================
-// AI GENERATION
-// ===========================================
-
-async function generateWithModel(
-    apiKey: string,
-    model: string,
-    minimalData: string
-): Promise<AIAnalysisResult | null> {
+function constructAnalysisFromReasoning(reasoningText: string): AIAnalysisResult | null {
     try {
-        const userPrompt = `Analyze this Solana token: ${minimalData}`;
+        const summary = extractSection(reasoningText, 'Summary', 'Risk Assessment') || 'Analysis completed based on available data.';
+        const riskAssessment = extractSection(reasoningText, 'Risk Assessment', 'Key Findings') || 'Risk level determined from security flags and market data.';
+        
+        const keyFindings: string[] = [];
+        const findingsSection = extractSection(reasoningText, 'Key Findings', 'Recommendations');
+        if (findingsSection) {
+            findingsSection.split(/\n\s*[-*\d.]+\s*/).forEach(b => {
+                const cleaned = b.trim();
+                if (cleaned.length > 10 && cleaned.length < 500) keyFindings.push(cleaned);
+            });
+        }
+        if (keyFindings.length === 0) keyFindings.push('Analysis based on token security flags and market data');
 
-        const messages: OpenRouterMessage[] = [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: userPrompt }
-        ];
+        const recommendations: string[] = [];
+        const recsSection = extractSection(reasoningText, 'Recommendations', '');
+        if (recsSection) {
+            recsSection.split(/\n\s*[-*\d.]+\s*/).forEach(b => {
+                const cleaned = b.trim();
+                if (cleaned.length > 10 && cleaned.length < 300) recommendations.push(cleaned);
+            });
+        }
+        if (recommendations.length === 0) recommendations.push('Exercise caution when interacting with this asset');
 
-        const requestBody: any = {
-            model,
-            messages,
-            max_tokens: 300,
-            temperature: 0.1,
+        console.log('[OpenRouter] Constructed analysis from reasoning text');
+        return {
+            summary: summary.slice(0, 500),
+            riskAssessment: riskAssessment.slice(0, 300),
+            keyFindings: keyFindings.slice(0, 5),
+            recommendations: recommendations.slice(0, 4),
         };
-
-        const response = await fetch(OPENROUTER_API_URL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-            const status = response.status;
-            let errorDetail = '';
-            try {
-                const errorJson = await response.json();
-                errorDetail = errorJson?.error?.message || JSON.stringify(errorJson);
-            } catch {
-                errorDetail = await response.text().catch(() => 'Unknown error');
-            }
-            console.error(`[OpenRouter] HTTP ${status} for ${model}: ${errorDetail}`);
-
-            // Rate limited - return null to try next
-            if (status === 429) return null;
-
-            return null;
-        }
-
-        const data: OpenRouterResponse = await response.json();
-
-        if (data.error) {
-            console.error('[OpenRouter] API Error:', data.error.message);
-            return null;
-        }
-
-        const text = data.choices?.[0]?.message?.content;
-        if (!text) return null;
-
-        // Fast JSON extraction
-        let jsonText = text;
-
-        // Remove code blocks
-        const codeMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-        if (codeMatch) jsonText = codeMatch[1];
-
-        // Extract JSON object
-        const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) return null;
-
-        const parsed = JSON.parse(jsonMatch[0]) as AIAnalysisResult;
-
-        // Quick validation
-        if (!parsed.summary || !parsed.keyFindings) return null;
-
-        // Ensure arrays exist
-        if (!Array.isArray(parsed.keyFindings)) parsed.keyFindings = [];
-        if (!Array.isArray(parsed.recommendations)) parsed.recommendations = [];
-
-        console.log(`[OpenRouter] Success with ${model}`);
-        return parsed;
-
-    } catch (error: any) {
-        console.error(`[OpenRouter] Error with ${model}:`, error.message);
+    } catch (error) {
+        console.error('[OpenRouter] Failed to construct analysis from reasoning:', error);
         return null;
     }
 }
 
+function extractSection(text: string, startMarker: string, endMarker: string): string {
+    const startRegex = new RegExp(`\\*\\*${startMarker}[^*]*\\*\\*:?\\s*`, 'i');
+    const startMatch = text.match(startRegex);
+    if (!startMatch) return '';
+    const startIdx = startMatch.index! + startMatch[0].length;
+    let endIdx = text.length;
+    if (endMarker) {
+        const endRegex = new RegExp(`\\*\\*${endMarker}[^*]*\\*\\*`, 'i');
+        const endMatch = text.slice(startIdx).match(endRegex);
+        if (endMatch && endMatch.index) endIdx = startIdx + endMatch.index;
+    }
+    return text.slice(startIdx, endIdx).trim();
+}
+
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(timeoutId);
+        return response;
+    } catch (error: any) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') throw new Error(`Request timeout after ${timeoutMs}ms`);
+        throw error;
+    }
+}
+
 // ===========================================
-// MAIN EXPORT
+// CORE API CALLER
 // ===========================================
 
-export async function generateSecurityAnalysis(
-    detectionData: any
+async function callOpenRouter(
+    messages: OpenRouterMessage[],
+    maxTokens: number = 2000
 ): Promise<AIAnalysisResult | null> {
-    console.log('[OpenRouter] Starting analysis for:', detectionData.address);
-
     const keys = getAPIKeys();
     if (keys.length === 0) {
         console.error('[OpenRouter] No API keys configured');
         return null;
     }
 
-    // Extract minimal data once
-    const minimalData = extractMinimalData(detectionData);
-    console.log('[OpenRouter] Minimal data size:', minimalData.length, 'chars');
+    // Try rotation
+    for (let i = 0; i < keys.length; i++) {
+        const apiKey = keys[currentKeyIndex % keys.length];
+        currentKeyIndex++; // Rotate for next time
+        
+        console.log(`[OpenRouter] Using Nemotron (Key attempt ${i + 1}/${keys.length})...`);
+        
+        try {
+            const response = await fetchWithTimeout(
+                OPENROUTER_API_URL,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': 'https://sivic.app',
+                        'X-Title': 'Sivic Security Analyzer',
+                    },
+                    body: JSON.stringify({
+                        model: AI_MODEL,
+                        messages,
+                        reasoning: { enabled: true },
+                        max_tokens: maxTokens,
+                        temperature: 0.1,
+                    }),
+                },
+                REQUEST_TIMEOUT_MS
+            );
 
-    // Try each model with rotating keys
-    for (const model of FREE_MODELS) {
-        // Get next API key (round-robin)
-        const apiKey = getNextAPIKey();
-        if (!apiKey) continue;
+            if (!response.ok) {
+                // Handle rate limits by continuing to next key
+                if (response.status === 429) {
+                    console.log('[OpenRouter] Rate limited, trying next key...');
+                    await new Promise(r => setTimeout(r, 1000));
+                    continue; 
+                }
+                const err = await response.text();
+                console.error(`[OpenRouter] HTTP ${response.status}:`, err);
+                continue; // Try next key for server errors too
+            }
 
-        console.log(`[OpenRouter] Trying ${model}`);
-
-        const result = await generateWithModel(apiKey, model, minimalData);
-        if (result) {
-            return result;
-        }
-
-        // Small delay before next attempt to avoid burst rate limits
-        await new Promise(r => setTimeout(r, 100));
-    }
-
-    // If all models failed with primary rotation, try backup keys with all models
-    if (keys.length > 1) {
-        console.log('[OpenRouter] Trying backup keys...');
-
-        for (let keyIdx = 1; keyIdx < keys.length; keyIdx++) {
-            const backupKey = keys[keyIdx];
-
-            for (const model of FREE_MODELS.slice(0, 3)) { // Only fast models
-                console.log(`[OpenRouter] Backup key ${keyIdx} with ${model}`);
-
-                const result = await generateWithModel(backupKey, model, minimalData);
-                if (result) {
-                    return result;
+            const data: OpenRouterResponse = await response.json();
+            
+            // Extract content strategy
+            let text = data.choices?.[0]?.message?.content;
+            
+            // Fallback to reasoning fields if content is empty
+            if (!text || !text.trim()) {
+                const msg = data.choices?.[0]?.message as any;
+                if (msg.reasoning && msg.reasoning.trim()) {
+                    console.log('[OpenRouter] Using "reasoning" field');
+                    text = msg.reasoning;
+                } else if (msg.reasoning_details && Array.isArray(msg.reasoning_details)) {
+                    // Combine reasoning details
+                     const combined = msg.reasoning_details
+                        .filter((d: any) => d.type === 'reasoning.text' && d.text)
+                        .map((d: any) => d.text)
+                        .join('\n');
+                    if (combined.trim()) {
+                        console.log('[OpenRouter] Using "reasoning_details" array');
+                        text = combined;
+                    }
                 }
             }
+
+            if (!text || !text.trim()) {
+                console.error('[OpenRouter] Empty response from model');
+                continue;
+            }
+
+            // Extract JSON
+            let jsonText = text;
+            const codeMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+            if (codeMatch) jsonText = codeMatch[1];
+            
+            const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+            
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]) as AIAnalysisResult;
+                // Validate fields
+                if (parsed.summary && (parsed.keyFindings || parsed.riskAssessment)) {
+                    return parsed;
+                }
+            } else {
+                console.log('[OpenRouter] No JSON found, attempting construction from text...');
+                const constructed = constructAnalysisFromReasoning(text);
+                if (constructed) return constructed;
+            }
+
+        } catch (error: any) {
+            console.error('[OpenRouter] Error:', error.message);
+            // Continue to next key on error
         }
     }
 
-    console.error('[OpenRouter] All attempts exhausted');
     return null;
 }
 
 // ===========================================
-// MEV ANALYSIS
+// PUBLIC EXPORTS
 // ===========================================
+
+export async function generateSecurityAnalysis(
+    detectionData: any
+): Promise<AIAnalysisResult | null> {
+    const minimalData = extractMinimalData(detectionData);
+    console.log('[OpenRouter] Starting Security Analysis. Input size:', minimalData.length);
+    
+    return callOpenRouter([
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: `Analyze this Solana token for security risks: ${minimalData}` }
+    ]);
+}
 
 export async function generateMEVReport(
     mevData: any
 ): Promise<AIAnalysisResult | null> {
-    console.log('[OpenRouter] Starting MEV report for:', mevData.transactionType);
-
-    const keys = getAPIKeys();
-    if (keys.length === 0) return null;
-
-    // Create a concise summary of the transaction for the AI
+    console.log('[OpenRouter] Starting MEV Report for:', mevData.transactionType);
+    
     const context = {
         type: mevData.transactionType,
         score: mevData.riskScore,
         level: mevData.riskLevel,
-        threats: mevData.threats.map((t: any) => `${t.type} (${t.severity})`),
+        threats: mevData.threats?.map((t: any) => `${t.type} (${t.severity})`) || [],
         programs: mevData.onChainData?.programsDetected || [],
         fee: mevData.onChainData?.fee || 0,
     };
-
     const minimalData = JSON.stringify(context);
-    console.log('[OpenRouter] MEV Context size:', minimalData.length, 'chars');
 
-    const systemPrompt = `Solana MEV expert. Analyze transaction risk. Return JSON:
-{"summary":"2 sentences on the MEV nature","riskAssessment":"1 sentence verdict","keyFindings":["f1","f2","f3"],"recommendations":["r1","r2","r3"]}`;
+    const mevSystemPrompt = `You are a Solana MEV expert. Analyze the transaction risk data and return ONLY a JSON object with this exact structure:
+{"summary":"2 sentences about MEV nature and risk","riskAssessment":"1 sentence overall verdict","keyFindings":["finding1","finding2","finding3"],"recommendations":["rec1","rec2","rec3"]}
+Do not include any text outside the JSON object.`;
 
-    // Try primary models
-    for (const model of FREE_MODELS) {
-        const apiKey = getNextAPIKey();
-        if (!apiKey) continue;
-
-        try {
-            const response = await fetch(OPENROUTER_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    model,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: `Analyze MEV risk: ${minimalData}` }
-                    ],
-                    max_tokens: 400,
-                    temperature: 0.1,
-                }),
-            });
-
-            if (!response.ok) continue;
-
-            const data = await response.json();
-            const text = data.choices?.[0]?.message?.content;
-            if (!text) continue;
-
-            // Extract JSON
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) continue;
-
-            const parsed = JSON.parse(jsonMatch[0]) as AIAnalysisResult;
-            if (parsed.summary && parsed.keyFindings) {
-                return parsed;
-            }
-        } catch (e) {
-            console.error(`[OpenRouter] MEV Analysis error with ${model}:`, e);
-        }
-    }
-
-    return null;
+    return callOpenRouter([
+        { role: 'system', content: mevSystemPrompt },
+        { role: 'user', content: `Analyze MEV risk: ${minimalData}` }
+    ], 1000); 
 }
 
-// ===========================================
-// HEALTH CHECK
-// ===========================================
-
-export function getAIStatus(): {
-    configured: boolean;
-    provider: string;
-    keyCount: number;
-    models: string[];
-} {
-    const keys = getAPIKeys();
+export function getAIStatus() {
     return {
-        configured: keys.length > 0,
+        configured: getAPIKeys().length > 0,
         provider: 'OpenRouter',
-        keyCount: keys.length,
-        models: FREE_MODELS,
+        keyCount: getAPIKeys().length,
+        model: AI_MODEL,
     };
 }

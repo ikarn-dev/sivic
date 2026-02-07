@@ -52,9 +52,10 @@ export async function GET() {
     return NextResponse.json({
         status: status.configured ? 'ok' : 'unconfigured',
         provider: status.provider,
-        models: status.models,
+        model: status.model,
+        keyCount: status.keyCount,
         message: status.configured
-            ? `OpenRouter AI ready with ${status.models.length} free models`
-            : 'No OpenRouter API key configured (OPENROUTER_API_KEY)',
+            ? `OpenRouter AI ready with model: ${status.model}`
+            : 'No OpenRouter API key configured',
     });
 }

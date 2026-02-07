@@ -1,11 +1,103 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, CSSProperties } from 'react';
+
+/* ... imports ... */
 
 /* ========================================
-   Premium Gradient Card Visual Elements
+   Base Card Component
    ======================================== */
 
+interface CardProps {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  hover?: boolean;
+  withBlobs?: boolean;
+  blobIntensity?: 'subtle' | 'normal' | 'strong';
+  rounded?: 'sm' | 'md' | 'lg' | 'xl';
+}
+
+/**
+ * Premium Card Component
+ * The unified card design with gradient blobs, noise texture, and depth
+ */
+export default function Card({
+  children,
+  className = '',
+  style = {},
+  hover = true,
+  withBlobs = true,
+  blobIntensity = 'normal',
+  rounded = 'lg'
+}: CardProps) {
+  const roundedClasses = {
+    sm: 'rounded-[16px]',
+    md: 'rounded-[20px]',
+    lg: 'rounded-[24px]',
+    xl: 'rounded-[32px]'
+  };
+
+  return (
+    <div
+      className={`relative overflow-hidden shadow-2xl transition-all duration-200 ${roundedClasses[rounded]} ${hover ? 'hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]' : ''} ${className}`}
+      style={{
+        background: 'linear-gradient(135deg, #050505 0%, #080808 50%, #030303 100%)',
+        border: '1px solid rgba(255, 255, 255, 0.25)',
+        transform: 'translateZ(0)', // GPU acceleration
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        ...style
+      }}
+    >
+      {/* Gradient Blobs */}
+      {withBlobs && <GradientBlobs intensity={blobIntensity} />}
+
+      {/* Noise Texture */}
+      <NoiseTexture />
+
+      {/* Vignette Effect */}
+      <Vignette />
+
+      {/* Content */}
+      <div className="relative z-10 h-full">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ... Stat Card Variants ... */
+
+/* ... */
+
+/* ========================================
+   Container Card Variants
+   ======================================== */
+
+interface GlassContainerCardProps {
+  children: ReactNode;
+  title?: string;
+  className?: string;
+  style?: CSSProperties;
+}
+
+/**
+ * Glass Container Card
+ * For larger content areas like lists, tables, charts
+ */
+export function GlassContainerCard({ children, title, className = '', style = {} }: GlassContainerCardProps) {
+  return (
+    <Card className={`p-4 sm:p-6 ${className}`} hover={false} blobIntensity="subtle" style={style}>
+      {title && (
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 font-nohemi">{title}</h2>
+      )}
+      <div className="relative z-10 font-satoshi">
+        {children}
+      </div>
+    </Card>
+  );
+}
 /**
  * Noise Texture Layer
  * Adds organic grain texture for depth
@@ -49,22 +141,24 @@ const GradientBlobs = ({ intensity = 'normal' }: { intensity?: 'subtle' | 'norma
 
   return (
     <>
-      {/* CSS Keyframes for blob animation */}
+      {/* CSS Keyframes for blob animation - only on desktop */}
       <style jsx>{`
-        @keyframes blobFloat1 {
-          0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-          25% { transform: translate(10px, -15px) rotate(5deg) scale(1.02); }
-          50% { transform: translate(-5px, -25px) rotate(-3deg) scale(0.98); }
-          75% { transform: translate(-15px, -10px) rotate(3deg) scale(1.01); }
-        }
-        @keyframes blobFloat2 {
-          0%, 100% { transform: rotate(-15deg) translate(0, 0); }
-          33% { transform: rotate(-12deg) translate(15px, 10px); }
-          66% { transform: rotate(-18deg) translate(-10px, 15px); }
-        }
-        @keyframes blobFloat3 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          50% { transform: translate(20px, -10px) scale(1.05); }
+        @media (min-width: 1024px) {
+          @keyframes blobFloat1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(10px, -15px) rotate(5deg) scale(1.02); }
+            50% { transform: translate(-5px, -25px) rotate(-3deg) scale(0.98); }
+            75% { transform: translate(-15px, -10px) rotate(3deg) scale(1.01); }
+          }
+          @keyframes blobFloat2 {
+            0%, 100% { transform: rotate(-15deg) translate(0, 0); }
+            33% { transform: rotate(-12deg) translate(15px, 10px); }
+            66% { transform: rotate(-18deg) translate(-10px, 15px); }
+          }
+          @keyframes blobFloat3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -10px) scale(1.05); }
+          }
         }
       `}</style>
 
@@ -148,62 +242,7 @@ const Vignette = () => (
   />
 );
 
-/* ========================================
-   Base Card Component
-   ======================================== */
 
-interface CardProps {
-  children: ReactNode;
-  className?: string;
-  hover?: boolean;
-  withBlobs?: boolean;
-  blobIntensity?: 'subtle' | 'normal' | 'strong';
-  rounded?: 'sm' | 'md' | 'lg' | 'xl';
-}
-
-/**
- * Premium Card Component
- * The unified card design with gradient blobs, noise texture, and depth
- */
-export default function Card({
-  children,
-  className = '',
-  hover = true,
-  withBlobs = true,
-  blobIntensity = 'normal',
-  rounded = 'lg'
-}: CardProps) {
-  const roundedClasses = {
-    sm: 'rounded-[16px]',
-    md: 'rounded-[20px]',
-    lg: 'rounded-[24px]',
-    xl: 'rounded-[32px]'
-  };
-
-  return (
-    <div
-      className={`relative overflow-hidden shadow-2xl transition-all duration-300 ${roundedClasses[rounded]} ${hover ? 'hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]' : ''} ${className}`}
-      style={{
-        background: 'linear-gradient(135deg, #050505 0%, #080808 50%, #030303 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.25)'
-      }}
-    >
-      {/* Gradient Blobs */}
-      {withBlobs && <GradientBlobs intensity={blobIntensity} />}
-
-      {/* Noise Texture */}
-      <NoiseTexture />
-
-      {/* Vignette Effect */}
-      <Vignette />
-
-      {/* Content */}
-      <div className="relative z-10 h-full">
-        {children}
-      </div>
-    </div>
-  );
-}
 
 /* ========================================
    Stat Card Variants
@@ -279,32 +318,7 @@ export function GlassStatCard({
   );
 }
 
-/* ========================================
-   Container Card Variants
-   ======================================== */
 
-interface GlassContainerCardProps {
-  children: ReactNode;
-  title?: string;
-  className?: string;
-}
-
-/**
- * Glass Container Card
- * For larger content areas like lists, tables, charts
- */
-export function GlassContainerCard({ children, title, className = '' }: GlassContainerCardProps) {
-  return (
-    <Card className={`p-4 sm:p-6 ${className}`} hover={false} blobIntensity="subtle">
-      {title && (
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 font-nohemi">{title}</h2>
-      )}
-      <div className="relative z-10 font-satoshi">
-        {children}
-      </div>
-    </Card>
-  );
-}
 
 interface GlassContainerEmptyProps {
   message?: string;

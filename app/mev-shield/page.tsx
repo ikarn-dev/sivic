@@ -7,7 +7,7 @@ import { InfoCardGrid } from '@/components/InfoCard';
 import { TransactionSandbox } from '@/components/TransactionSandbox';
 import { NetworkActivityVisualization } from '@/components/NetworkActivityVisualization';
 import { OnChainMetrics } from '@/components/OnChainMetrics';
-import { FAQ } from '@/components/FAQ';
+import { EducationalAccordion } from '@/components/EducationalAccordion';
 import { useNetworkHealth } from '@/hooks/useNetworkHealth';
 import { useMEVStats } from '@/hooks/useMEVStats';
 import { formatRelativeTime } from '@/lib/utils/format';
@@ -101,7 +101,7 @@ export default function MEVShieldPage() {
                 </GlassContainerCard>
 
                 {/* Educational FAQ Section */}
-                <FAQ />
+                <EducationalAccordion />
             </div>
         </DashboardLayout>
     );

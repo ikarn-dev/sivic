@@ -331,6 +331,50 @@ body {
 }
 
 /* ========================================
+   Mobile Scroll Disappearing Fix
+   ======================================== */
+/* Prevent cards from disappearing during mobile scroll */
+@media (max-width: 1023px) {
+
+  /* GPU acceleration for all interactive elements */
+  .glass-card,
+  [class*="Card"],
+  [class*="card"] {
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+  }
+
+  /* Prevent scroll chaining and rubber-band effects */
+  html {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+  }
+
+  body {
+    overscroll-behavior-y: contain;
+    overflow-x: hidden;
+  }
+
+  /* Main content scroll optimization */
+  .main-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    contain: layout style;
+  }
+
+  /* Disable complex animations on mobile for better performance */
+  .glass-card::before,
+  [class*="Card"]::before {
+    animation: none !important;
+  }
+}
+
+/* ========================================
    Safe Area for iPhone Notch
    ======================================== */
 .safe-area-bottom {
