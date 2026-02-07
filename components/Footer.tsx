@@ -30,8 +30,8 @@ const TelegramIcon = () => (
 
 // Social links configuration - export for use in Sidebar
 export const socialLinks = [
-    { name: 'Twitter', href: 'https://twitter.com/sivic', icon: TwitterIcon },
-    { name: 'GitHub', href: 'https://github.com/sivic', icon: GitHubIcon },
+    { name: 'Twitter', href: 'https://x.com/iKK6600', icon: TwitterIcon },
+    { name: 'GitHub', href: 'https://github.com/ikarn-dev/sivic', icon: GitHubIcon },
 ];
 
 // Export icons for other components

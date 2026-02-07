@@ -82,7 +82,7 @@ export default function Sidebar() {
               Resources
             </div>
             <Link
-              href="https://github.com/sivic"
+              href="https://github.com/ikarn-dev/sivic/tree/main/docs"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-3 w-full rounded-lg transition-all duration-200 border bg-transparent border-transparent hover:bg-[rgba(255,255,255,0.03)] px-3 py-2.5"
