@@ -7,7 +7,6 @@ import { InfoCardGrid } from '@/components/InfoCard';
 import { TransactionSandbox } from '@/components/TransactionSandbox';
 import { NetworkActivityVisualization } from '@/components/NetworkActivityVisualization';
 import { OnChainMetrics } from '@/components/OnChainMetrics';
-import { EducationalAccordion } from '@/components/EducationalAccordion';
 import { useNetworkHealth } from '@/hooks/useNetworkHealth';
 import { useMEVStats } from '@/hooks/useMEVStats';
 import { formatRelativeTime } from '@/lib/utils/format';
@@ -100,8 +99,10 @@ export default function MEVShieldPage() {
                     <InfoCardGrid cards={mevAttackTypes} columns={4} />
                 </GlassContainerCard>
 
-                {/* Educational FAQ Section */}
-                <EducationalAccordion />
+                {/* MEV Attack Types Reference (Educational - static content) */}
+                <GlassContainerCard title="MEV Attack Types">
+                    <InfoCardGrid cards={mevAttackTypes} columns={4} />
+                </GlassContainerCard>
             </div>
         </DashboardLayout>
     );

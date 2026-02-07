@@ -87,8 +87,8 @@ export function NetworkActivityVisualization({
                     {/* TPS Gauge */}
                     <div className="relative p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/[0.06]">
                         <div className="text-center">
-                            <p className="text-xs text-[rgba(255,255,255,0.4)] mb-2">Transactions/sec</p>
-                            <p className="text-3xl font-bold text-white tracking-tight">
+                            <p className="text-[10px] sm:text-xs text-[rgba(255,255,255,0.4)] mb-2">Transactions/sec</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                                 {tps.toLocaleString()}
                             </p>
                             <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -97,7 +97,7 @@ export function NetworkActivityVisualization({
                                     style={{ width: `${activityMetrics.networkLoad}%` }}
                                 />
                             </div>
-                            <p className="text-xs text-[rgba(255,255,255,0.3)] mt-1.5">
+                            <p className="text-[10px] sm:text-xs text-[rgba(255,255,255,0.3)] mt-1.5">
                                 {activityMetrics.networkLoad}% capacity
                             </p>
                         </div>
@@ -106,14 +106,14 @@ export function NetworkActivityVisualization({
                     {/* Network Congestion */}
                     <div className="relative p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/[0.06]">
                         <div className="text-center">
-                            <p className="text-xs text-[rgba(255,255,255,0.4)] mb-2">Congestion Level</p>
+                            <p className="text-[10px] sm:text-xs text-[rgba(255,255,255,0.4)] mb-2">Congestion Level</p>
                             <div className="flex items-center justify-center gap-2">
-                                <div className={`w-3 h-3 rounded-full ${styles.bg} shadow-lg ${styles.glow}`} />
-                                <span className={`text-2xl font-semibold capitalize ${styles.text}`}>
+                                <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${styles.bg} shadow-lg ${styles.glow}`} />
+                                <span className={`text-xl sm:text-2xl font-semibold capitalize ${styles.text}`}>
                                     {congestion}
                                 </span>
                             </div>
-                            <p className="text-xs text-[rgba(255,255,255,0.3)] mt-3">
+                            <p className="text-[10px] sm:text-xs text-[rgba(255,255,255,0.3)] mt-3">
                                 MEV Exposure: <span className={styles.text}>{activityMetrics.mevExposure}</span>
                             </p>
                         </div>
@@ -122,11 +122,11 @@ export function NetworkActivityVisualization({
                     {/* Success Rate */}
                     <div className="relative p-4 rounded-xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/[0.06]">
                         <div className="text-center">
-                            <p className="text-xs text-[rgba(255,255,255,0.4)] mb-2">Success Rate</p>
-                            <p className={`text-3xl font-bold tracking-tight ${successRate >= 95 ? 'text-green-400' : successRate >= 90 ? 'text-yellow-400' : 'text-red-400'}`}>
+                            <p className="text-[10px] sm:text-xs text-[rgba(255,255,255,0.4)] mb-2">Success Rate</p>
+                            <p className={`text-2xl sm:text-3xl font-bold tracking-tight ${successRate >= 95 ? 'text-green-400' : successRate >= 90 ? 'text-yellow-400' : 'text-red-400'}`}>
                                 {successRate.toFixed(1)}%
                             </p>
-                            <p className="text-xs text-[rgba(255,255,255,0.3)] mt-3">
+                            <p className="text-[10px] sm:text-xs text-[rgba(255,255,255,0.3)] mt-3">
                                 Transaction confirmations
                             </p>
                         </div>

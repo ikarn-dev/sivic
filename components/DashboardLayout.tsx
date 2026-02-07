@@ -16,7 +16,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {children}
         </main>
         {/* Footer - hidden on mobile due to bottom navbar */}
-        <div className="hidden lg:block mt-auto">
+        <div className="hidden lg:block mt-auto relative z-10">
           <Footer />
         </div>
       </div>

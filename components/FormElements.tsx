@@ -152,7 +152,7 @@ export function PrimaryButton({ children, fullWidth = false, ...props }: Primary
     return (
         <button
             {...props}
-            className={`py-1.5 px-3 text-xs sm:py-2 sm:px-4 sm:text-sm rounded-lg bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${fullWidth ? 'w-full' : ''} ${props.className || ''}`}
+            className={`py-1 px-2.5 text-[11px] sm:py-2 sm:px-4 sm:text-sm rounded-lg bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${fullWidth ? 'w-full' : ''} ${props.className || ''}`}
         >
             {children}
         </button>
@@ -172,7 +172,7 @@ export function SecondaryButton({ children, fullWidth = false, ...props }: Secon
     return (
         <button
             {...props}
-            className={`py-1.5 px-3 text-xs sm:py-2 sm:px-4 sm:text-sm rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white font-medium hover:bg-[rgba(255,255,255,0.1)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${fullWidth ? 'w-full' : ''} ${props.className || ''}`}
+            className={`py-1 px-2.5 text-[11px] sm:py-2 sm:px-4 sm:text-sm rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white font-medium hover:bg-[rgba(255,255,255,0.1)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${fullWidth ? 'w-full' : ''} ${props.className || ''}`}
         >
             {children}
         </button>

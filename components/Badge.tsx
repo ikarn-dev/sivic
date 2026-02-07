@@ -34,9 +34,9 @@ const dotColors = {
 };
 
 const sizes = {
-    sm: 'text-xs px-2 py-0.5 min-h-[20px]',
-    md: 'text-sm px-2.5 py-0.5 min-h-[24px]',
-    lg: 'text-sm px-3 py-1 min-h-[28px]',
+    sm: 'text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 min-h-[18px] sm:min-h-[20px]',
+    md: 'text-xs sm:text-sm px-2 sm:px-2.5 py-0.5 min-h-[22px] sm:min-h-[24px]',
+    lg: 'text-xs sm:text-sm px-2.5 sm:px-3 py-1 min-h-[26px] sm:min-h-[28px]',
 };
 
 export function Badge({

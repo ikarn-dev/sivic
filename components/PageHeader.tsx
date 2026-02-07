@@ -14,7 +14,7 @@ export function PageHeader({ title, description, rightContent }: PageHeaderProps
     return (
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-1">
             <div className="text-left">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1 font-nohemi">{title}</h1>
+                <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-white mb-1 font-nohemi">{title}</h1>
                 <p className="text-[#9ca3af] text-[10px] sm:text-xs font-satoshi">{description}</p>
             </div>
             {/* Badge positioned in top-right on mobile, inline on desktop */}

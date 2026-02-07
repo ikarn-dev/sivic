@@ -90,7 +90,7 @@ export function GlassContainerCard({ children, title, className = '', style = {}
   return (
     <Card className={`p-4 sm:p-6 ${className}`} hover={false} blobIntensity="subtle" style={style}>
       {title && (
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 font-nohemi">{title}</h2>
+        <h2 className="text-base sm:text-xl font-semibold text-white mb-3 sm:mb-6 font-nohemi">{title}</h2>
       )}
       <div className="relative z-10 font-satoshi">
         {children}
@@ -141,28 +141,12 @@ const GradientBlobs = ({ intensity = 'normal' }: { intensity?: 'subtle' | 'norma
 
   return (
     <>
-      {/* CSS Keyframes for blob animation - only on desktop */}
+      {/* CSS Keyframes for blob animation - removed */}
       <style jsx>{`
-        @media (min-width: 1024px) {
-          @keyframes blobFloat1 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-            25% { transform: translate(10px, -15px) rotate(5deg) scale(1.02); }
-            50% { transform: translate(-5px, -25px) rotate(-3deg) scale(0.98); }
-            75% { transform: translate(-15px, -10px) rotate(3deg) scale(1.01); }
-          }
-          @keyframes blobFloat2 {
-            0%, 100% { transform: rotate(-15deg) translate(0, 0); }
-            33% { transform: rotate(-12deg) translate(15px, 10px); }
-            66% { transform: rotate(-18deg) translate(-10px, 15px); }
-          }
-          @keyframes blobFloat3 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(20px, -10px) scale(1.05); }
-          }
-        }
+        /* Animations removed */
       `}</style>
 
-      {/* Primary orange gradient blob - reduced opacity, animated */}
+      {/* Primary orange gradient blob - static */}
       <div
         className="pointer-events-none absolute -right-8 -top-8"
         style={{
@@ -172,11 +156,10 @@ const GradientBlobs = ({ intensity = 'normal' }: { intensity?: 'subtle' | 'norma
           filter: 'blur(50px)',
           borderRadius: '60% 40% 70% 30% / 50% 60% 40% 50%',
           zIndex: 0,
-          animation: 'blobFloat1 12s ease-in-out infinite'
         }}
       />
 
-      {/* Secondary gradient blob - reduced and animated */}
+      {/* Secondary gradient blob - static */}
       <div
         className="pointer-events-none absolute left-1/4 top-1/3"
         style={{
@@ -186,11 +169,10 @@ const GradientBlobs = ({ intensity = 'normal' }: { intensity?: 'subtle' | 'norma
           filter: 'blur(60px)',
           borderRadius: '40% 60% 30% 70% / 60% 40% 60% 40%',
           zIndex: 0,
-          animation: 'blobFloat2 15s ease-in-out infinite'
         }}
       />
 
-      {/* Accent blob - reduced and animated */}
+      {/* Accent blob - static */}
       <div
         className="pointer-events-none absolute -bottom-12 left-1/3"
         style={{
@@ -200,7 +182,6 @@ const GradientBlobs = ({ intensity = 'normal' }: { intensity?: 'subtle' | 'norma
           filter: 'blur(55px)',
           borderRadius: '50% 50% 40% 60% / 40% 50% 50% 60%',
           zIndex: 0,
-          animation: 'blobFloat3 18s ease-in-out infinite'
         }}
       />
 
@@ -262,8 +243,8 @@ export function StatCard({ title, value, className = '' }: StatCardProps) {
   return (
     <Card className={`p-4 sm:p-6 ${className}`} hover={true}>
       <div className="flex flex-col justify-end h-full">
-        <p className="text-white/60 text-xs sm:text-sm font-medium tracking-wide mb-1 sm:mb-2 font-nohemi">{title}</p>
-        <h3 className="text-white text-2xl sm:text-3xl font-bold tracking-tight font-satoshi">{value}</h3>
+        <p className="text-white/60 text-[10px] sm:text-sm font-medium tracking-wide mb-1 sm:mb-2 font-nohemi">{title}</p>
+        <h3 className="text-white text-xl sm:text-3xl font-bold tracking-tight font-satoshi">{value}</h3>
       </div>
     </Card>
   );
@@ -310,7 +291,7 @@ export function GlassStatCard({
     <Card className={`p-4 sm:p-6 ${variantStyles[variant]} ${className}`} hover={true}>
       <div className="flex flex-col justify-end h-full min-h-[50px] sm:min-h-[80px]">
         <p className="text-white/60 text-[10px] sm:text-sm font-medium tracking-wide mb-0.5 sm:mb-2 font-nohemi">{title}</p>
-        <h3 className={`font-bold tracking-tight font-satoshi ${valueColors[variant]} ${large ? 'text-xl sm:text-4xl' : 'text-lg sm:text-3xl'}`}>
+        <h3 className={`font-bold tracking-tight font-satoshi ${valueColors[variant]} ${large ? 'text-lg sm:text-4xl' : 'text-base sm:text-3xl'}`}>
           {value}
         </h3>
       </div>
